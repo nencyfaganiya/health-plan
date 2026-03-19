@@ -11,4 +11,4 @@ A personal health companion app — daily routine tracker, meal planner, exercis
 - Progress history with calendar view
 
 ## Open the app
-👉 [Open Health Plan]([./health-companion.html](https://nencyfaganiya.github.io/health-plan/health-companion.html))
+👉 [Open Health Plan](https://nencyfaganiya.github.io/health-plan/health-companion.html)
