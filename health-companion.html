@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#F4820A">
+<meta name="apple-mobile-web-app-title" content="Health Plan">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="./manifest.json">
+<title>My Health Plan 🌿</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Lora:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --or:#F4820A;--tu:#F9B32F;--gr:#2E8B57;--mi:#4CAF82;--sk:#3A7BD5;
+  --cr:#FFF8F0;--tx:#2C1810;--t2:#6B4C3B;--t3:#9E7B6E;--cd:#FFF;
+  --bd:#F0E6DC;--re:#E05252;--pu:#7C5CBF;--ra:16px;
+  --sh:0 3px 18px rgba(44,24,16,0.09);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Nunito',sans-serif;background:var(--cr);color:var(--tx);max-width:430px;margin:0 auto;padding-bottom:86px;min-height:100vh}
+
+/* HEADER */
+.hdr{background:linear-gradient(135deg,#E07200 0%,var(--or) 50%,#F5920A 100%);padding:16px 16px 18px;position:relative;overflow:hidden}
+.hdr::before{content:'';position:absolute;top:-35px;right:-15px;width:110px;height:110px;background:rgba(255,255,255,0.09);border-radius:50%}
+.hdr::after{content:'';position:absolute;bottom:-20px;left:30px;width:70px;height:70px;background:rgba(255,255,255,0.06);border-radius:50%}
+.hdr-top{display:flex;justify-content:space-between;align-items:flex-start;position:relative}
+.hdr-left .greet{color:rgba(255,255,255,0.8);font-size:11px;font-weight:700;letter-spacing:.4px}
+.hdr-left h1{color:#fff;font-size:19px;font-weight:900;margin-top:1px;font-family:'Lora',serif}
+.dbadge{background:rgba(255,255,255,0.18);color:#fff;font-size:10px;font-weight:700;padding:5px 11px;border-radius:16px;text-align:right;line-height:1.4}
+.phase-strip{margin-top:12px;background:rgba(0,0,0,0.15);border-radius:10px;padding:9px 13px;display:flex;align-items:center;gap:10px;position:relative}
+.phase-info{flex:1}
+.phase-main{color:#fff;font-size:12px;font-weight:800}
+.phase-sub{color:rgba(255,255,255,0.75);font-size:10px;font-weight:600;margin-top:1px}
+.streak-box{background:rgba(255,255,255,0.15);border-radius:8px;padding:5px 10px;text-align:center}
+.streak-n{color:var(--tu);font-size:16px;font-weight:900;line-height:1}
+.streak-l{color:rgba(255,255,255,0.7);font-size:9px;font-weight:700}
+
+/* NAV */
+.nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:#fff;border-top:1px solid var(--bd);display:flex;padding:5px 0 10px;z-index:100;box-shadow:0 -3px 16px rgba(44,24,16,0.09)}
+.ni{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;padding:3px 0;border:none;background:none;font-family:'Nunito',sans-serif}
+.ni-ic{font-size:20px;transition:transform .2s}
+.ni-lb{font-size:9px;font-weight:700;color:var(--t3)}
+.ni.active .ni-lb{color:var(--or)}
+.ni.active .ni-ic{transform:scale(1.12)}
+
+/* PAGES */
+.page{display:none;padding:0 14px}
+.page.active{display:block}
+.pp{padding-top:11px}
+.st{font-family:'Lora',serif;font-size:15px;font-weight:600;color:var(--tx);margin:15px 0 9px}
+.st span{color:var(--or)}
+
+/* NOTIF */
+.nb{background:#fff;border:1.5px solid var(--bd);border-radius:12px;padding:11px 13px;margin:11px 14px 0;display:flex;align-items:center;gap:10px;box-shadow:var(--sh)}
+.nb.ok{background:#F0FBF5;border-color:var(--mi)}
+.nb-t{font-size:12px;font-weight:800;color:var(--tx)}
+.nb-s{font-size:10px;color:var(--t3);font-weight:600;margin-top:1px}
+.nb-btn{background:var(--or);color:#fff;border:none;border-radius:8px;padding:7px 12px;font-size:11px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;flex-shrink:0}
+.nb-btn.ok{background:var(--mi)}
+
+/* PROGRESS RING */
+.prog-card{background:#fff;border-radius:var(--ra);padding:14px;margin:10px 0 0;box-shadow:var(--sh);display:flex;align-items:center;gap:14px}
+.ring-w{position:relative;width:72px;height:72px;flex-shrink:0}
+.ring-w svg{transform:rotate(-90deg)}
+.ring-tx{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center}
+.rpct{font-size:18px;font-weight:900;color:var(--or);line-height:1}
+.rlb{font-size:8px;font-weight:700;color:var(--t3);margin-top:1px}
+.prog-info h3{font-size:13px;font-weight:800;color:var(--tx)}
+.prog-info p{font-size:11px;color:var(--t2);margin-top:3px;font-weight:600;line-height:1.5}
+
+/* TODAY EXERCISE CARD */
+.today-ex{background:linear-gradient(135deg,#F0E8FF,#E8DEFF);border:1.5px solid #D4C4FF;border-radius:var(--ra);padding:13px 14px;margin:10px 0 0}
+.tex-hdr{display:flex;align-items:center;gap:9px;margin-bottom:8px}
+.tex-icon{font-size:22px}
+.tex-title{font-size:13px;font-weight:800;color:var(--pu)}
+.tex-phase{font-size:10px;font-weight:700;color:rgba(124,92,191,.7);margin-top:1px}
+.tex-detail{font-size:12px;color:#4A3070;font-weight:600;line-height:1.6}
+.tex-steps{margin-top:8px;display:flex;flex-direction:column;gap:4px}
+.tex-step{display:flex;align-items:flex-start;gap:7px;font-size:11px;color:#5A3A9A;font-weight:600}
+.tex-step-dot{width:5px;height:5px;border-radius:50%;background:var(--pu);margin-top:5px;flex-shrink:0}
+.tex-done-btn{width:100%;margin-top:10px;background:var(--pu);color:#fff;border:none;border-radius:10px;padding:9px;font-size:12px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;transition:all .2s}
+.tex-done-btn.done{background:var(--mi)}
+
+/* WATER */
+.wc{background:linear-gradient(135deg,#E8F4FF,#D4EAFF);border-radius:var(--ra);padding:12px 14px;border:1.5px solid #B8D8F8;margin-top:10px}
+.wt{font-size:11px;font-weight:800;color:var(--sk);margin-bottom:7px}
+.wg{display:flex;gap:5px;flex-wrap:wrap}
+.gb{width:32px;height:32px;border-radius:7px;border:2px solid #B8D8F8;background:#fff;font-size:15px;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center}
+.gb.f{background:var(--sk);border-color:var(--sk)}
+.wcnt{font-size:10px;color:var(--sk);font-weight:700;margin-top:6px}
+
+/* ROUTINE */
+.rl{display:flex;flex-direction:column;gap:7px}
+.rc{background:#fff;border-radius:13px;padding:10px 12px;display:flex;align-items:center;gap:10px;box-shadow:var(--sh);border:1.5px solid transparent;cursor:pointer;transition:all .2s;user-select:none}
+.rc.done{border-color:var(--mi);background:#F0FBF5}
+.rc.now{border-color:var(--tu);background:#FFFBF0}
+.rc.skip{opacity:.55}
+.rc:active{transform:scale(0.97)}
+.tbadge{background:var(--cr);border:1.5px solid var(--bd);border-radius:8px;padding:4px 7px;font-size:9px;font-weight:800;color:var(--or);min-width:44px;text-align:center;line-height:1.3;flex-shrink:0;white-space:pre-line}
+.rc.done .tbadge{background:#E8F7EF;border-color:var(--mi);color:var(--gr)}
+.rc.now .tbadge{background:#FFF8E0;border-color:var(--tu);color:#9A6800}
+.ri{flex:1}
+.rt{font-size:12px;font-weight:700;color:var(--tx);line-height:1.2}
+.rs{font-size:10px;color:var(--t3);margin-top:2px;font-weight:600;line-height:1.4}
+.rc.done .rt{text-decoration:line-through;color:var(--t3)}
+.ck{width:24px;height:24px;border-radius:50%;border:2px solid var(--bd);background:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;transition:all .2s;color:transparent}
+.rc.done .ck{background:var(--mi);border-color:var(--mi);color:#fff}
+.nowbadge{background:var(--or);color:#fff;font-size:8px;font-weight:800;padding:2px 6px;border-radius:4px;margin-top:3px;display:inline-block}
+.wknd-badge{background:#E8F0FF;color:var(--sk);font-size:8px;font-weight:800;padding:2px 6px;border-radius:4px;display:inline-block;margin-bottom:6px}
+
+/* MEALS */
+.day-strip{display:flex;gap:5px;overflow-x:auto;padding:2px 0 8px;scrollbar-width:none}
+.day-strip::-webkit-scrollbar{display:none}
+.day-btn{flex-shrink:0;background:#fff;border:1.5px solid var(--bd);border-radius:11px;padding:6px 10px;text-align:center;cursor:pointer;min-width:46px;font-family:'Nunito',sans-serif;transition:all .2s}
+.day-btn.active{background:var(--or);border-color:var(--or)}
+.day-btn.today-mark{border-color:var(--mi)}
+.dn{font-size:9px;font-weight:800;color:var(--t3)}
+.day-btn.active .dn,.day-btn.active .dd{color:#fff}
+.dd{font-size:13px;font-weight:900;color:var(--tx)}
+.ddot{width:5px;height:5px;border-radius:50%;background:var(--mi);margin:2px auto 0}
+
+.msc{background:#fff;border-radius:var(--ra);box-shadow:var(--sh);margin-bottom:8px;overflow:hidden}
+.msh{padding:10px 13px 7px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between}
+.msl{font-size:11px;font-weight:800;color:var(--t3)}
+.mst{font-size:10px;font-weight:700;color:var(--or);background:var(--cr);padding:2px 8px;border-radius:6px;border:1px solid var(--bd)}
+.mopts{padding:6px 12px 10px;display:flex;flex-direction:column;gap:5px}
+.mopt{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:10px;border:1.5px solid var(--bd);cursor:pointer;transition:all .2s;background:#fff}
+.mopt.sel{border-color:var(--or);background:#FFF5EB}
+.moi{font-size:18px;flex-shrink:0}
+.mon{font-size:12px;font-weight:700;color:var(--tx)}
+.motags{display:flex;gap:3px;margin-top:2px;flex-wrap:wrap}
+.tag{display:inline-block;padding:1px 6px;border-radius:4px;font-size:9px;font-weight:800}
+.tg{background:#FFF0E6;color:var(--or)}
+.tp{background:#E8F0FF;color:var(--sk)}
+.tl{background:#E8F7EF;color:var(--gr)}
+.tb{background:#F0E8FF;color:var(--pu)}
+
+/* SHOPPING */
+.shopcard{background:#fff;border-radius:var(--ra);box-shadow:var(--sh);overflow:hidden;margin-bottom:10px}
+.shophead{padding:11px 14px;background:var(--gr);display:flex;justify-content:space-between;align-items:center}
+.shophead-t{color:#fff;font-size:12px;font-weight:800}
+.shophead-s{color:rgba(255,255,255,.75);font-size:9px;font-weight:600;margin-top:1px}
+.shopbody{padding:7px 12px}
+.si{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px dashed var(--bd)}
+.si:last-child{border-bottom:none}
+.sck{width:20px;height:20px;border-radius:5px;border:2px solid var(--bd);background:#fff;flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:10px;transition:all .2s}
+.sck.chk{background:var(--mi);border-color:var(--mi);color:#fff}
+.st2{font-size:11px;font-weight:600;color:var(--tx);flex:1}
+.st2.chk{text-decoration:line-through;color:var(--t3)}
+
+/* EXERCISE */
+.phase-tabs{display:flex;gap:5px;overflow-x:auto;padding:2px 0 8px;scrollbar-width:none}
+.phase-tabs::-webkit-scrollbar{display:none}
+.ptab{flex-shrink:0;background:#fff;border:1.5px solid var(--bd);border-radius:16px;padding:6px 12px;font-size:11px;font-weight:700;color:var(--t2);cursor:pointer;font-family:'Nunito',sans-serif;transition:all .2s}
+.ptab.active{background:var(--pu);border-color:var(--pu);color:#fff}
+
+.week-track{background:#fff;border-radius:var(--ra);box-shadow:var(--sh);padding:13px 14px;margin-bottom:10px}
+.wt-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.wt-title{font-size:13px;font-weight:800;color:var(--tx)}
+.wt-badge{font-size:10px;font-weight:800;padding:3px 10px;border-radius:8px}
+.wt-prog{display:flex;gap:4px}
+.wk-dot{flex:1;height:6px;border-radius:3px;background:var(--bd);transition:background .3s}
+.wk-dot.done{background:var(--mi)}
+.wk-dot.current{background:var(--or)}
+.wt-weeks{display:flex;justify-content:space-between;margin-top:4px}
+.wt-wlabel{font-size:9px;font-weight:700;color:var(--t3)}
+
+.exc-card{background:#fff;border-radius:var(--ra);box-shadow:var(--sh);overflow:hidden;margin-bottom:10px}
+.exc-hdr{padding:13px 14px 10px;background:linear-gradient(135deg,var(--pu),#5A3A9A);display:flex;align-items:center;justify-content:space-between}
+.exc-hdr-t{color:#fff;font-size:13px;font-weight:800}
+.exc-hdr-s{color:rgba(255,255,255,.7);font-size:10px;margin-top:1px}
+.exc-body{padding:11px 14px}
+.exc-phase-desc{font-size:11px;color:var(--t2);font-weight:600;line-height:1.6;margin-bottom:10px;padding:9px 11px;background:var(--cr);border-radius:9px}
+.exday{display:flex;align-items:flex-start;gap:9px;padding:8px 0;border-bottom:1px dashed var(--bd);cursor:pointer}
+.exday:last-child{border-bottom:none}
+.exday.today-ex-row{background:#F8F0FF;border-radius:9px;padding:8px 9px;margin:0 -3px;border-bottom:none}
+.exday-day{font-size:10px;font-weight:800;color:var(--pu);min-width:28px;margin-top:2px}
+.exday-info{flex:1}
+.exday-title{font-size:12px;font-weight:700;color:var(--tx)}
+.exday-detail{font-size:10px;color:var(--t3);font-weight:600;margin-top:2px;line-height:1.5}
+.exday-dur{font-size:9px;font-weight:800;color:var(--pu);background:#F0E8FF;padding:2px 7px;border-radius:5px;margin-top:3px;display:inline-block}
+.today-marker{font-size:9px;font-weight:800;color:var(--or);background:#FFF0E6;padding:2px 7px;border-radius:5px;margin-left:4px}
+.ex-tip{background:#F8F0FF;border-radius:9px;padding:9px 11px;margin-top:9px;font-size:11px;color:var(--pu);font-weight:600;line-height:1.6;border-left:3px solid var(--pu)}
+
+/* PROGRESS / HISTORY */
+.sum-card{background:#fff;border-radius:var(--ra);box-shadow:var(--sh);padding:13px 14px;margin-bottom:9px}
+.sum-title{font-size:12px;font-weight:800;color:var(--tx);margin-bottom:10px}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.stat-box{background:var(--cr);border-radius:11px;padding:10px;text-align:center}
+.stat-n{font-size:20px;font-weight:900}
+.stat-l{font-size:10px;font-weight:700;color:var(--t3);margin-top:2px}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-top:8px}
+.cal-hdr{font-size:8px;font-weight:800;color:var(--t3);text-align:center;padding:2px 0}
+.cal-day{aspect-ratio:1;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;background:var(--bd);color:var(--t3)}
+.cal-day.has-data{background:#D4EAFF;color:var(--sk)}
+.cal-day.perfect{background:var(--mi);color:#fff}
+.cal-day.today-cal{border:2px solid var(--or)}
+.history-list{display:flex;flex-direction:column;gap:7px;margin-top:8px}
+.hist-item{background:var(--cr);border-radius:10px;padding:9px 11px;display:flex;align-items:center;gap:10px}
+.hist-date{font-size:10px;font-weight:800;color:var(--t2);min-width:52px}
+.hist-bars{flex:1;display:flex;gap:4px;align-items:center}
+.hist-bar-wrap{flex:1}
+.hist-bar-label{font-size:8px;font-weight:700;color:var(--t3);margin-bottom:2px}
+.hist-bar{height:5px;border-radius:3px;background:var(--bd)}
+.hist-bar-fill{height:100%;border-radius:3px;transition:width .5s ease}
+.hist-score{font-size:12px;font-weight:800;min-width:30px;text-align:right}
+
+/* TIPS */
+.tip{background:#fff;border-radius:var(--ra);padding:12px 14px;box-shadow:var(--sh);margin-bottom:8px;border-left:4px solid var(--or)}
+.tip-c{font-size:9px;font-weight:800;letter-spacing:.7px;text-transform:uppercase;color:var(--or);margin-bottom:3px}
+.tip-t{font-size:11px;color:var(--tx);font-weight:600;line-height:1.6}
+.tip.gr{border-left-color:var(--gr)}.tip.gr .tip-c{color:var(--gr)}
+.tip.bl{border-left-color:var(--sk)}.tip.bl .tip-c{color:var(--sk)}
+.tip.pu{border-left-color:var(--pu)}.tip.pu .tip-c{color:var(--pu)}
+.alert-b{background:linear-gradient(135deg,var(--tu),var(--or));border-radius:11px;padding:11px 13px;margin-bottom:10px;display:flex;align-items:center;gap:9px}
+.alert-t{font-size:11px;color:#fff;font-weight:700;line-height:1.5;flex:1}
+.alert-t b{font-size:12px;display:block}
+
+/* SUPP */
+.sc{background:#fff;border-radius:var(--ra);padding:12px 14px;box-shadow:var(--sh);margin-bottom:8px;display:flex;gap:11px;align-items:flex-start;cursor:pointer;border:1.5px solid transparent;transition:all .2s}
+.sc.tk{border-color:var(--mi);background:#F0FBF5}
+.sn{font-size:12px;font-weight:800;color:var(--tx)}
+.sd{font-size:10px;color:var(--t2);font-weight:600;margin-top:2px;line-height:1.5}
+.sw{font-size:9px;font-weight:800;color:var(--sk);margin-top:3px}
+.sc.tk .sn{text-decoration:line-through;color:var(--t3)}
+
+.fi{display:flex;align-items:flex-start;gap:8px;padding:6px 0;border-bottom:1px dashed var(--bd)}
+.fi:last-child{border-bottom:none}
+.fd{width:6px;height:6px;border-radius:50%;margin-top:5px;flex-shrink:0}
+.ft{font-size:11px;color:var(--tx);font-weight:600;line-height:1.4}
+.fn{font-size:9px;color:var(--t3);font-weight:600;margin-top:1px}
+
+.toast{position:fixed;bottom:95px;left:50%;transform:translateX(-50%);background:#2C1810;color:#fff;padding:10px 16px;border-radius:10px;font-size:11px;font-weight:700;z-index:999;max-width:320px;text-align:center;box-shadow:0 4px 18px rgba(0,0,0,.3);transition:opacity .3s}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="hdr-top">
+    <div class="hdr-left">
+      <div class="greet" id="greet">Good morning</div>
+      <h1>My Health Plan 🌿</h1>
+    </div>
+    <div class="dbadge" id="dbadge">Loading…</div>
+  </div>
+  <div class="phase-strip">
+    <div class="phase-info">
+      <div class="phase-main" id="phaseMain">Phase 1 — Foundation</div>
+      <div class="phase-sub" id="phaseSub">Week 1 of 4 · Tap Exercise to change phase</div>
+    </div>
+    <div class="streak-box">
+      <div class="streak-n" id="streakN">0</div>
+      <div class="streak-l">🔥 STREAK</div>
+    </div>
+  </div>
+</div>
+
+<div class="nb" id="nb">
+  <div style="font-size:20px">🔔</div>
+  <div style="flex:1">
+    <div class="nb-t">Enable daily reminders</div>
+    <div class="nb-s">Hourly water + walk, meals, exercise, isabgol & more</div>
+  </div>
+  <button class="nb-btn" id="nbBtn" onclick="askNotif()">Allow</button>
+</div>
+
+<!-- TODAY -->
+<div class="page active pp" id="page-today">
+  <div class="prog-card">
+    <div class="ring-w">
+      <svg width="72" height="72" viewBox="0 0 72 72">
+        <circle cx="36" cy="36" r="28" fill="none" stroke="#F0E6DC" stroke-width="7"/>
+        <circle id="pring" cx="36" cy="36" r="28" fill="none" stroke="#F4820A" stroke-width="7" stroke-linecap="round" stroke-dasharray="175.9" stroke-dashoffset="175.9" style="transition:stroke-dashoffset .6s ease"/>
+      </svg>
+      <div class="ring-tx"><div class="rpct" id="ppct">0%</div><div class="rlb">DONE</div></div>
+    </div>
+    <div class="prog-info"><h3 id="ptitle">Ready to start!</h3><p id="pmsg">Tap each task to mark complete 💪</p></div>
+  </div>
+
+  <div id="todayExCard"></div>
+
+  <div class="wc">
+    <div class="wt">💧 Water tracker — tap each glass as you drink</div>
+    <div class="wg" id="wg"></div>
+    <div class="wcnt" id="wcnt">0 of 8 glasses</div>
+  </div>
+
+  <div class="st">Today's <span>routine</span></div>
+  <div id="wkndBadge"></div>
+  <div class="rl" id="rl"></div>
+</div>
+
+<!-- MEALS -->
+<div class="page pp" id="page-meals">
+  <div class="st"><span>Meal</span> planner</div>
+  <div class="day-strip" id="dayStrip"></div>
+  <div id="mealSlots"></div>
+  <div class="st" style="margin-top:4px">🛒 <span>Shopping</span> list</div>
+  <div id="shopList"></div>
+</div>
+
+<!-- EXERCISE -->
+<div class="page pp" id="page-exercise">
+  <div class="st"><span>Exercise</span> plan</div>
+  <div class="phase-tabs" id="phaseTabs"></div>
+  <div id="weekTrack"></div>
+  <div id="exContent"></div>
+</div>
+
+<!-- PROGRESS -->
+<div class="page pp" id="page-progress">
+  <div class="st"><span>My</span> progress</div>
+  <div id="progressContent"></div>
+</div>
+
+<!-- TIPS -->
+<div class="page pp" id="page-tips">
+  <div class="st"><span>Health</span> tips</div>
+  <div class="alert-b"><div style="font-size:18px">⚠️</div><div class="alert-t"><b>Book your GP appointment</b>Ask for Vitamin D, B12 &amp; Iron blood test. Mention the anal fissure needs topical cream (diltiazem).</div></div>
+  <div class="tip"><div class="tip-c">🌿 Replace Strigol naturally</div><div class="tip-t">Take <b>1 tbsp Isabgol</b> in warm water every night. Your permanent natural replacement for Strigol. Sat Isabgol or Dabur brand from any Indian grocery.</div></div>
+  <div class="tip"><div class="tip-c">💧 Water first, tea second</div><div class="tip-t">Drink 1 full glass of warm water before morning tea. Tea with milk mildly dehydrates. Water first protects your gut all day.</div></div>
+  <div class="tip gr"><div class="tip-c">🚶 Stand every hour at work</div><div class="tip-t">You sit 8–5. Hourly reminders are set on weekdays. Stand, walk 2 mins, drink water. Back pain and fatigue reduce within 2 weeks.</div></div>
+  <div class="tip gr"><div class="tip-c">🧘 5-min morning stretch</div><div class="tip-t">Cat-cow: hands and knees, arch up then dip down, 10 times. Then hug both knees to chest. Decompresses your spine before work every day.</div></div>
+  <div class="tip bl"><div class="tip-c">🌙 Dinner by 7:30–8pm</div><div class="tip-t">Eating at 9:30pm and sleeping at 10:30pm = 1 hour to digest. Lighter, earlier dinner is the biggest single change for your stomach size.</div></div>
+  <div class="tip bl"><div class="tip-c">🚶 10-min walk after dinner</div><div class="tip-t">Short walk after dinner dramatically improves digestion and reduces overnight bloating. Even walking at home counts. Do it before sitting.</div></div>
+  <div class="tip pu"><div class="tip-c">✨ Get your blood tested</div><div class="tip-t">Vitamin D and B12 deficiency are extremely common for Indian-origin people in the UK. They cause fatigue, dull skin, and muscle pain. Free NHS test — book it this week.</div></div>
+  <div class="tip pu"><div class="tip-c">😴 Screens off 30 mins before sleep</div><div class="tip-t">Instagram and TV blue light disrupts melatonin. This is causing your morning grogginess. Put the phone down at 10pm — your mornings will transform.</div></div>
+  <div class="st"><span>Daily</span> essentials</div>
+  <div id="suppList"></div>
+  <div class="st">🛒 One-time shopping</div>
+  <div style="background:#fff;border-radius:var(--ra);box-shadow:var(--sh);padding:10px 13px">
+    <div class="fi"><div class="fd" style="background:var(--gr)"></div><div><div class="ft">Isabgol — Sat Isabgol or Dabur brand</div><div class="fn">Indian grocery · £2–3</div></div></div>
+    <div class="fi"><div class="fd" style="background:var(--sk)"></div><div><div class="ft">Vitamin D3 1000–2000 IU (after GP confirms)</div><div class="fn">Boots or Holland &amp; Barrett</div></div></div>
+    <div class="fi"><div class="fd" style="background:var(--pu)"></div><div><div class="ft">B12 supplement (after GP test)</div><div class="fn">Holland &amp; Barrett — sublingual tablets</div></div></div>
+    <div class="fi"><div class="fd" style="background:var(--or)"></div><div><div class="ft">Flaxseeds (alsi) — whole bag, grind before use</div><div class="fn">Indian grocer or supermarket</div></div></div>
+    <div class="fi"><div class="fd" style="background:var(--mi)"></div><div><div class="ft">Papaya, guava, banana — weekly supply</div><div class="fn">For daily morning fruit ritual</div></div></div>
+    <div class="fi"><div class="fd" style="background:var(--tu)"></div><div><div class="ft">Jeera (cumin) for morning warm water</div><div class="fn">Indian grocer — relieves acidity</div></div></div>
+  </div>
+  <div style="height:10px"></div>
+</div>
+
+<nav class="nav">
+  <button class="ni active" onclick="goPage('today',this)"><div class="ni-ic">☀️</div><div class="ni-lb">TODAY</div></button>
+  <button class="ni" onclick="goPage('meals',this)"><div class="ni-ic">🍛</div><div class="ni-lb">MEALS</div></button>
+  <button class="ni" onclick="goPage('exercise',this)"><div class="ni-ic">💪</div><div class="ni-lb">EXERCISE</div></button>
+  <button class="ni" onclick="goPage('progress',this)"><div class="ni-ic">📈</div><div class="ni-lb">PROGRESS</div></button>
+  <button class="ni" onclick="goPage('tips',this)"><div class="ni-ic">💡</div><div class="ni-lb">TIPS</div></button>
+</nav>
+
+<script>
+// ===== ALL DATA =====
+
+// Exercise phases — 3 phases, each with 7 days
+const PHASES = [
+  {
+    id:0, label:'Phase 1', sub:'Foundation', weeks:'Weeks 1–4', totalWeeks:4,
+    desc:'Very gentle. Build the habit first — just 20–25 mins, 5 days. No gym needed. Focus on routine, not intensity.',
+    badge:'#FFF0E6', badgeC:var_or(),
+    days:[
+      {day:'Mon',title:'Morning walk + stretch',detail:'15-min brisk walk (outside or on the spot). Then 5 mins cat-cow + knee-to-chest stretches for spine.',steps:['15 min brisk walk','10x cat-cow stretch','Knee-to-chest hold 30 secs each side','5 mins anulom vilom breathing'],dur:'20 min'},
+      {day:'Tue',title:'Beginner yoga',detail:'YouTube: search "Yoga for beginners back pain" — Fit Tuber or Yoga with Adriene. Follow along at home.',steps:['Warm up 2 mins walking on spot','Follow beginner yoga video','Focus on spinal moves','End with Shavasana 3 mins'],dur:'25 min'},
+      {day:'Wed',title:'Walk + breathing',detail:'20-min brisk walk at lunch or evening. Then 5 mins anulom vilom pranayama. Deep belly breathing.',steps:['20 min brisk walk','5 mins anulom vilom','Focus on deep belly breathing'],dur:'25 min'},
+      {day:'Thu',title:'Gentle bodyweight',detail:'3 rounds: 10 wall push-ups, 10 knee squats, 20-sec plank (knees ok). 60 secs rest between rounds.',steps:['10 wall push-ups','10 slow knee squats','20-sec plank hold (knees ok)','Rest 60 secs — repeat 3 rounds'],dur:'20 min'},
+      {day:'Fri',title:'Walk + full stretch',detail:'20-min walk. Then hamstring and hip flexor stretches — essential for desk workers with back pain.',steps:['20 min walk','Hamstring stretch 30 secs each','Hip flexor lunge stretch','Seated spinal twist each side'],dur:'25 min'},
+      {day:'Sat',title:'Longer walk or yoga',detail:'30-min park walk or 30-min yoga video. Weekend is your best opportunity — make it enjoyable.',steps:['30 min outdoor walk','Or: 30 min full yoga video','Enjoy it — no pressure'],dur:'30 min'},
+      {day:'Sun',title:'Rest + light stretch',detail:'Full rest day. Optional: 10-min gentle stretch only if you feel like it. Recovery is part of the plan.',steps:['Full rest day','Optional: 10 mins gentle stretching','No cardio today'],dur:'Rest'},
+    ],
+    tip:'Do not worry about intensity. The goal this month is simply to move daily and build the habit. Even 15 minutes counts. If you miss a day — do not give up, just start again tomorrow.'
+  },
+  {
+    id:1, label:'Phase 2', sub:'Building strength', weeks:'Weeks 5–10', totalWeeks:6,
+    desc:'Build real core and back strength. This directly fixes your back pain and reduces your stomach size over 6 weeks.',
+    badge:'#E8F0FF', badgeC:var_sk(),
+    days:[
+      {day:'Mon',title:'Core + back strength',detail:'3 rounds: 10 push-ups, 15 squats, 30-sec plank, 10 glute bridges. Core work targets your back pain directly.',steps:['10 full push-ups (or knees)','15 bodyweight squats','30-sec plank hold','10 glute bridges','Rest 60 secs — repeat 3 rounds'],dur:'30 min'},
+      {day:'Tue',title:'Brisk walk or jog intervals',detail:'30 mins: walk 2 mins, jog 1 min, repeat. Build up gradually. Your cardiovascular base starts here.',steps:['5 min warm-up walk','Alternate: 2 min walk / 1 min jog','Repeat for 20 mins','5 min cool-down walk'],dur:'30 min'},
+      {day:'Wed',title:'Yoga for digestion + back',detail:'YouTube: "yoga for digestion and back pain". Twists and forward folds directly help your gut health.',steps:['Seated spinal twist both sides','Seated forward fold','Supine twist','Cat-cow flow 10 rounds','Deep breathing 5 mins'],dur:'30 min'},
+      {day:'Thu',title:'Full body strength',detail:'4 rounds: 12 push-ups, 15 squats, 10 lunges each leg, 40-sec plank, 10 Superman holds (key for back).',steps:['12 push-ups','15 squats','10 lunges each leg','40-sec plank','10 Superman holds (3-sec hold each)','Rest 75 secs — 4 rounds'],dur:'35 min'},
+      {day:'Fri',title:'Walk + deep stretch',detail:'30-min brisk walk. Then full body stretch focusing on hips, hamstrings, and spine. Hold 30 secs each.',steps:['30 min brisk walk','Hip flexor stretch each side','Hamstring stretch','Pigeon pose each side','Spinal twist'],dur:'30 min'},
+      {day:'Sat',title:'Active outdoor session',detail:'45-min walk, cycling, or sport you enjoy. Saturday is your longest session — make it something fun.',steps:['45 mins outdoor activity','Walk, cycle, swim or sport','Enjoy being outside — Vitamin D!'],dur:'45 min'},
+      {day:'Sun',title:'Active recovery yoga',detail:'20-min gentle yoga flow only. Focus on breathing and relaxation. No cardio. Let muscles recover.',steps:['20 min gentle yoga','Focus on deep breathing','Shavasana 5 mins','No intense exercise today'],dur:'20 min'},
+    ],
+    tip:'The Superman hold (lie face down, lift arms and legs 3 secs, lower) is the single best exercise for your lower back pain. Do it every day even outside your workout — 10 reps takes 2 minutes.'
+  },
+  {
+    id:2, label:'Phase 3', sub:'Transformation', weeks:'Month 3+', totalWeeks:8,
+    desc:'Stamina, strength, and a visibly slimmer stomach. Progress each week by adding 5 reps to every exercise.',
+    badge:'#F0E8FF', badgeC:var_pu(),
+    days:[
+      {day:'Mon',title:'Strength circuit A',detail:'4 rounds: 15 push-ups, 20 squats, 12 lunges, 60-sec plank, 15 glute bridges, 12 Superman holds.',steps:['15 push-ups','20 squats','12 lunges each leg','60-sec plank','15 glute bridges','12 Superman holds','Rest 60 secs — 4 rounds'],dur:'40 min'},
+      {day:'Tue',title:'Run or fast walk',detail:'30 mins: warm up 5 mins, jog 20 mins continuous (or very brisk walk), cool down 5 mins.',steps:['5 min walk warm-up','20 min continuous jog','(Or: very brisk walk if still building)','5 min cool-down walk','Stretch calves + hamstrings'],dur:'35 min'},
+      {day:'Wed',title:'Yoga + kapalbhati',detail:'40-min yoga with twists for gut, backbends for spine. Add 5 mins Kapalbhati breathing — powerful for belly fat.',steps:['10 min warm-up flow','Spinal twists both sides','Cobra + upward dog','5 min Kapalbhati pranayama','10 min cool-down'],dur:'40 min'},
+      {day:'Thu',title:'HIIT (light version)',detail:'20 mins: 30 sec jumping jacks, 30 sec rest, 30 sec high knees, 30 sec rest — 10 rounds. Great for belly fat.',steps:['2 min warm-up','30 sec jumping jacks','30 sec rest','30 sec high knees','30 sec rest','Repeat 10 rounds','2 min cool-down'],dur:'25 min'},
+      {day:'Fri',title:'Strength circuit B',detail:'Same as Monday but add 5 extra reps to every exercise. Progressive overload is how you keep improving.',steps:['20 push-ups','25 squats','15 lunges each leg','75-sec plank','20 glute bridges','15 Superman holds','Rest 60 secs — 4 rounds'],dur:'45 min'},
+      {day:'Sat',title:'Long outdoor activity',detail:'60-min walk, cycle, swim, or any sport. Get outdoors — Vitamin D, fresh air, and mental health boost.',steps:['60 mins outdoor activity','Any sport or activity you enjoy','Stay active throughout'],dur:'60 min'},
+      {day:'Sun',title:'Yoga + meditation',detail:'30-min yoga flow + 10-min meditation or Shavasana. Mental rest is as important as physical rest.',steps:['30 min yoga flow','5 min pranayama','10 min meditation or Shavasana'],dur:'40 min'},
+    ],
+    tip:'By Phase 3 you should see real changes — better sleep, less back pain, flatter stomach. Add 5 reps to strength exercises every week. Track how you feel, not just how you look.'
+  }
+];
+
+function var_or(){return '#F4820A';}
+function var_sk(){return '#3A7BD5';}
+function var_pu(){return '#7C5CBF';}
+
+// Weekday routine (Mon–Fri)
+const ROUTINE_WEEKDAY = [
+  {id:'rw0',time:'05:45',lbl:'5:45\nAM',icon:'🌅',title:'Wake up + warm water',sub:'1 full glass warm water before tea',nt:'🌅 Good morning!',nb:'Drink warm water first — before tea, before anything 💧'},
+  {id:'rw1',time:'05:55',lbl:'5:55\nAM',icon:'🧘',title:'Morning stretches',sub:'Cat-cow + anulom vilom (10–15 mins)',nt:'🧘 Stretch time!',nb:'10 mins stretches + breathing — your back needs this daily'},
+  {id:'rw2',time:'06:10',lbl:'6:10\nAM',icon:'🍵',title:'Breakfast + tea',sub:'Fruit first, then bhakhri/poha/thepla',nt:'🍵 Breakfast!',nb:'Eat fruit first — then your breakfast and tea'},
+  {id:'rw3',time:'10:30',lbl:'10:30\nAM',icon:'🍌',title:'Mid-morning snack',sub:'Fruit or avocado toast',nt:'🍌 Snack time!',nb:'Fruit or avocado toast — keep energy steady'},
+  {id:'rw4',time:'13:00',lbl:'1:00\nPM',icon:'🍱',title:'Lunch',sub:'Dal + sabzi + roti/rice + curd or salad',nt:'🍱 Lunch time!',nb:'Dal every day + small salad. Eat away from your desk!'},
+  {id:'rw_ex',time:'17:30',lbl:'5:30\nPM',icon:'💪',title:'Evening exercise',sub:'',nt:'💪 Exercise time!',nb:'Your exercise session for today — check Exercise tab',isExercise:true},
+  {id:'rw5',time:'19:30',lbl:'7:30\nPM',icon:'🍽️',title:'Dinner — light & early',sub:'Dal/khichdi + sabzi + 1–2 roti',nt:'🍽️ Dinner!',nb:'Light dinner — dal, sabzi, 1–2 roti. Eat by 8pm!'},
+  {id:'rw6',time:'19:50',lbl:'7:50\nPM',icon:'🚶',title:'Post-dinner walk',sub:'10 mins outside or at home',nt:'🚶 After-dinner walk!',nb:'10 min walk now — great for digestion and your belly'},
+  {id:'rw7',time:'21:30',lbl:'9:30\nPM',icon:'🌿',title:'Isabgol before bed',sub:'1 tbsp in warm water, drink quickly',nt:'🌿 Isabgol time!',nb:'1 tbsp Isabgol in warm water — your natural Strigol'},
+  {id:'rw8',time:'22:00',lbl:'10:00\nPM',icon:'📵',title:'Phone off — wind down',sub:'No Instagram/TV, rest your eyes',nt:'📵 Wind down!',nb:'Put the phone down. Your sleep will improve noticeably'},
+  {id:'rw9',time:'22:30',lbl:'10:30\nPM',icon:'🌙',title:'Sleep',sub:'7 hours minimum',nt:'🌙 Sleep time!',nb:'Good night — you did great today 😴'},
+];
+
+// Weekend routine (Sat–Sun)
+const ROUTINE_WEEKEND = [
+  {id:'rwe0',time:'08:00',lbl:'8:00\nAM',icon:'🌅',title:'Wake up + warm water',sub:'1 full glass warm water — enjoy slower morning',nt:'🌅 Good morning!',nb:'Weekend morning — drink warm water and take it easy 💧'},
+  {id:'rwe1',time:'08:15',lbl:'8:15\nAM',icon:'🛁',title:'Bath + freshen up',sub:'Start the morning fresh',nt:'🛁 Morning routine!',nb:'Fresh start to your weekend morning'},
+  {id:'rwe2',time:'08:45',lbl:'8:45\nAM',icon:'🍵',title:'Breakfast + tea',sub:'Fruit first, then a nice weekend breakfast',nt:'🍵 Breakfast!',nb:'Fruit first, then enjoy a proper weekend breakfast'},
+  {id:'rwe_ex',time:'10:00',lbl:'10:00\nAM',icon:'💪',title:'Weekend exercise',sub:'',nt:'💪 Exercise time!',nb:'Your weekend exercise session — check Exercise tab',isExercise:true},
+  {id:'rwe3',time:'13:00',lbl:'1:00\nPM',icon:'🍱',title:'Lunch',sub:'Dal + sabzi + roti + curd',nt:'🍱 Lunch!',nb:'Nice weekend lunch — dal, sabzi, roti, curd'},
+  {id:'rwe4',time:'15:00',lbl:'3:00\nPM',icon:'🛒',title:'Grocery + errands',sub:'Check your meal plan shopping list',nt:'🛒 Errands time!',nb:'Check your meal plan for the week and do grocery shopping'},
+  {id:'rwe5',time:'18:00',lbl:'6:00\nPM',icon:'🍳',title:'Cook dinner',sub:'Nice meal — dal tadka, sabzi, fresh roti',nt:'🍳 Cook dinner!',nb:'Enjoy cooking your weekend dinner — take your time'},
+  {id:'rwe6',time:'19:30',lbl:'7:30\nPM',icon:'🍽️',title:'Dinner',sub:'Earlier than weekdays — enjoy it',nt:'🍽️ Dinner!',nb:'Weekend dinner — eat by 7:30pm, keep it balanced'},
+  {id:'rwe7',time:'19:50',lbl:'7:50\nPM',icon:'🚶',title:'Post-dinner walk',sub:'10–15 mins outside',nt:'🚶 Evening walk!',nb:'Nice post-dinner walk — enjoy the evening air'},
+  {id:'rwe8',time:'21:30',lbl:'9:30\nPM',icon:'🌿',title:'Isabgol before bed',sub:'1 tbsp in warm water',nt:'🌿 Isabgol!',nb:'1 tbsp Isabgol in warm water before bed'},
+  {id:'rwe9',time:'22:30',lbl:'10:30\nPM',icon:'🌙',title:'Sleep',sub:'Good sleep sets up your whole week',nt:'🌙 Sleep!',nb:'Good night — great weekend! 😴'},
+];
+
+const MEAL_OPTIONS = {
+  breakfast:[
+    {id:'bf1',icon:'🥣',name:'Poha',tags:['gut','light'],ing:['Poha (flattened rice) — 1 cup','Onion — 1 small','Mustard seeds + curry leaves','Turmeric + lemon juice','1 fruit before eating']},
+    {id:'bf2',icon:'🫓',name:'Thepla + curd',tags:['gut'],ing:['Thepla — 2–3 pieces','Fresh curd — small bowl','Green chutney','1 banana or guava']},
+    {id:'bf3',icon:'🥘',name:'Upma',tags:['light','gut'],ing:['Semolina (suji) — ¾ cup','Onion + tomato + chilli','Mustard seeds + curry leaves','Mixed veg optional','1 fruit on side']},
+    {id:'bf4',icon:'🧆',name:'Khaman or Locho',tags:['gut','light'],ing:['Khaman or locho — 3–4 pieces','Green chutney','1 fruit before eating']},
+    {id:'bf5',icon:'🍳',name:'Egg bhurji + toast',tags:['protein'],ing:['Eggs — 2','Onion + tomato + chilli','Ghee or oil — 1 tsp','Wholemeal toast — 1–2 slices','1 fruit on side']},
+    {id:'bf6',icon:'🧇',name:'Medu vada + sambar',tags:['probiotic','gut'],ing:['Medu vada — 2 pieces','Sambar — small bowl','Coconut chutney','1 fruit before']},
+    {id:'bf7',icon:'🫔',name:'Bhakhri + curd',tags:['gut'],ing:['Bhakhri — 2–3 pieces','Fresh curd — bowl','Green chutney','1 fruit first']},
+  ],
+  midmorning:[
+    {id:'mm1',icon:'🥑',name:'Avocado toast',tags:['light','protein'],ing:['Wholemeal bread — 1–2 slices','Ripe avocado — ½','Lemon + salt + chilli flakes']},
+    {id:'mm2',icon:'🍌',name:'Seasonal fruit',tags:['gut','light'],ing:['Banana, papaya, or guava — 1 piece','Optional: small handful walnuts']},
+    {id:'mm3',icon:'🥛',name:'Curd + flaxseeds',tags:['probiotic','gut'],ing:['Fresh curd — small bowl','Ground flaxseeds — 1 tbsp','Pinch jeera powder']},
+    {id:'mm4',icon:'🥜',name:'Fruit + nuts',tags:['light'],ing:['Apple or pear — 1','Walnuts or almonds — small handful']},
+  ],
+  lunch:[
+    {id:'lu1',icon:'🍱',name:'Dal + sabzi + roti',tags:['gut','protein'],ing:['Dal (any) — 1 katori','Sabzi (any veg) — 1 katori','Roti — 2','Curd or salad: cucumber, tomato, onion']},
+    {id:'lu2',icon:'🍚',name:'Dal + rice + sabzi',tags:['gut'],ing:['Dal — 1 katori','Basmati rice — 1 cup cooked','Sabzi — 1 katori','Small salad on side']},
+    {id:'lu3',icon:'🥚',name:'Egg curry + roti',tags:['protein'],ing:['Eggs — 2','Onion + tomato + ginger garlic paste','Spices: cumin, coriander, turmeric','Roti — 2','Small salad']},
+    {id:'lu4',icon:'🧀',name:'Paneer curry + roti',tags:['protein'],ing:['Paneer — 100g','Onion + tomato + capsicum','Ginger garlic paste + spices','Roti — 2','Curd on side']},
+    {id:'lu5',icon:'🫘',name:'Rajma or Chole + rice',tags:['gut','protein'],ing:['Rajma or chole — 1 katori (soak overnight)','Onion + tomato + ginger garlic','Spices: cumin, coriander, garam masala','Rice — 1 cup or roti — 2']},
+    {id:'lu6',icon:'🌯',name:'Veg wrap',tags:['light'],ing:['Wholemeal wrap — 2','Hummus or green chutney','Lettuce, tomato, cucumber, onion','Paneer or boiled egg optional']},
+    {id:'lu7',icon:'🍲',name:'Sambar rice',tags:['gut','probiotic'],ing:['Sambar — 1 bowl','Rice — 1 cup','Papad — 1–2']},
+  ],
+  dinner:[
+    {id:'di1',icon:'🍲',name:'Khichdi (best for gut)',tags:['gut','light'],ing:['Moong dal — ½ cup','Basmati rice — ½ cup','Ghee — 1 tsp','Turmeric + cumin seeds','Curd on side']},
+    {id:'di2',icon:'🍽️',name:'Dal + sabzi + roti',tags:['gut','light'],ing:['Thin dal (moong/masoor) — 1 katori','Light sabzi — 1 katori','Roti — 1–2','Small bowl curd']},
+    {id:'di3',icon:'🫓',name:'Dosa + sambar',tags:['probiotic','gut'],ing:['Dosa batter — for 2 dosas','Sambar — 1 bowl','Coconut chutney']},
+    {id:'di4',icon:'🥚',name:'Egg curry + roti',tags:['protein','light'],ing:['Eggs — 2','Light tomato onion gravy','Ginger + garlic + minimal oil','Roti — 1–2']},
+    {id:'di5',icon:'🥘',name:'Veg soup + roti',tags:['light','gut'],ing:['Mixed veg: carrot, beans, spinach','Onion + garlic + ginger','Vegetable stock','Roti — 1–2']},
+    {id:'di6',icon:'🧀',name:'Paneer bhurji + roti',tags:['protein','light'],ing:['Paneer — 80g crumbled','Onion + tomato + capsicum','Minimal oil + spices','Roti — 1–2']},
+  ]
+};
+
+const SUPPS = [
+  {id:'s1',icon:'🌿',name:'Isabgol (psyllium husk)',detail:'1 tbsp in warm water. Stir well, drink quickly.',when:'Every night 9:30 PM'},
+  {id:'s2',icon:'☀️',name:'Vitamin D3 (after GP test)',detail:'1000–2000 IU daily. Likely deficient in UK.',when:'Morning with breakfast'},
+  {id:'s3',icon:'🅱️',name:'Vitamin B12 (after GP test)',detail:'Sublingual tablets absorb best.',when:'Morning with breakfast'},
+  {id:'s4',icon:'🐟',name:'Flaxseeds (alsi)',detail:'1 tbsp ground in food. Skin, eyes, joints.',when:'Add to breakfast food'},
+  {id:'s5',icon:'🧈',name:'Ghee — small amount',detail:'1 tsp on roti or in dal. Gut and skin health.',when:'With lunch or dinner'},
+];
+
+const HOURLY_NOTIFS = [
+  {h:8,t:'💧 Drink water + quick walk!',b:'Start hydrated. Glass of water + stand up 2 mins'},
+  {h:9,t:'💧 Water + stand up!',b:'Glass of water and a 2-min walk around the office'},
+  {h:10,t:'💧 Hourly water + walk!',b:'Drink water and do a quick back stretch at your desk'},
+  {h:11,t:'💧 Water + stretch break!',b:'Glass of water + 2-min walk. Your back will thank you'},
+  {h:12,t:'💧 Midday water + walk!',b:'One more glass before lunch. Stand up and move 2 mins'},
+  {h:13,t:'💧 Post-lunch water!',b:'Drink water after lunch. Helps digestion and reduces bloating'},
+  {h:14,t:'💧 Afternoon water + walk!',b:'2pm water break — stand, walk 2 mins, drink a glass'},
+  {h:15,t:'💧 Water + movement!',b:'Drink water and take a short walk. You\'ve been sitting too long!'},
+  {h:16,t:'💧 4pm water + walk!',b:'Almost end of day — drink water and final walk break'},
+  {h:17,t:'💧 End of work water!',b:'Finishing up? Drink water before heading home'},
+];
+
+// ===== STATE =====
+const KEY='hpv5';
+function load(){try{return JSON.parse(localStorage.getItem(KEY))||{};}catch(e){return{};}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+let S=load();
+if(!S.done)S.done={};
+if(!S.supp)S.supp={};
+if(!S.plans)S.plans={};
+if(!S.shopC)S.shopC={};
+if(!S.history)S.history={};
+if(S.water===undefined)S.water=0;
+if(S.streak===undefined)S.streak=0;
+if(S.activePhase===undefined)S.activePhase=0;
+if(S.phaseStartDate===undefined)S.phaseStartDate=new Date().toISOString().split('T')[0];
+if(S.activeDay===undefined)S.activeDay=getTodayDayIndex();
+if(!S.lastDate)S.lastDate='';
+
+const NOW=new Date();
+const todayStr=NOW.toDateString();
+const isWeekday=NOW.getDay()>=1&&NOW.getDay()<=5;
+
+// Day reset
+if(S.lastDate!==todayStr){
+  // Save yesterday's record
+  if(S.lastDate){
+    const tot=getCurrentRoutine().length;
+    const dn=Object.values(S.done).filter(Boolean).length;
+    const score=Math.round(dn/tot*100);
+    S.history[S.lastDate]={score,water:S.water,tasks:dn,total:tot,phase:S.activePhase};
+    const yest=new Date(NOW);yest.setDate(yest.getDate()-1);
+    S.streak=S.lastDate===yest.toDateString()?(S.streak||0)+1:0;
+  }
+  S.done={};S.water=0;S.supp={};
+  S.lastDate=todayStr;
+  save();
+}
+
+function getTodayDayIndex(){
+  const d=new Date().getDay();
+  return d===0?6:d-1; // Mon=0 … Sun=6
+}
+
+function getCurrentRoutine(){
+  const dow=new Date().getDay(); // 0=Sun,6=Sat
+  return(dow===0||dow===6)?ROUTINE_WEEKEND:ROUTINE_WEEKDAY;
+}
+
+function getTodayExercise(){
+  const ph=PHASES[S.activePhase];
+  const dow=new Date().getDay();
+  const idx=dow===0?6:dow-1; // Mon=0..Sun=6
+  return ph.days[idx];
+}
+
+function getPhaseWeek(){
+  const start=new Date(S.phaseStartDate);
+  const now=new Date();
+  const diff=Math.floor((now-start)/(7*24*60*60*1000));
+  return Math.min(diff+1,PHASES[S.activePhase].totalWeeks);
+}
+
+// ===== SETUP =====
+function setup(){
+  const h=NOW.getHours();
+  const dayName=NOW.toLocaleDateString('en-GB',{weekday:'long'});
+  const dateStr=NOW.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+  document.getElementById('dbadge').innerHTML=`<div>${dayName}</div><div>${dateStr}</div>`;
+  document.getElementById('greet').textContent=h<12?'Good morning':h<17?'Good afternoon':'Good evening';
+  document.getElementById('streakN').textContent=S.streak;
+  updatePhaseHeader();
+  updateNB();
+  if((S.notifOk||Notification.permission==='granted')&&'serviceWorker' in navigator){
+    navigator.serviceWorker.register('./sw.js', {scope: './'}).then(()=>scheduleAll()).catch(()=>{});
+  }
+}
+
+function updatePhaseHeader(){
+  const ph=PHASES[S.activePhase];
+  const week=getPhaseWeek();
+  document.getElementById('phaseMain').textContent=`${ph.label} — ${ph.sub}`;
+  document.getElementById('phaseSub').textContent=`${ph.weeks} · Week ${week} of ${ph.totalWeeks}`;
+}
+
+// ===== NOTIFICATIONS =====
+async function askNotif(){
+  if(!('Notification' in window)){alert('Try Chrome on Android or Safari 16.4+ on iPhone.');return;}
+  const p=await Notification.requestPermission();
+  if(p==='granted'){
+    S.notifOk=true;save();updateNB();
+    await navigator.serviceWorker.register('./sw.js', {scope: './'});
+    await navigator.serviceWorker.ready;
+    scheduleAll();
+    toast('🔔 Reminders set! Hourly water+walk on weekdays, all meals, exercise, isabgol & more.');
+  } else {
+    alert('Please enable notifications for this site in browser settings, then tap Allow.');
+  }
+}
+
+function updateNB(){
+  const ok=S.notifOk||Notification.permission==='granted';
+  if(ok){
+    document.getElementById('nb').className='nb ok';
+    document.querySelector('.nb-t').textContent='Reminders active ✓';
+    document.querySelector('.nb-s').textContent='Hourly water+walk (weekdays) + all daily tasks';
+    document.getElementById('nbBtn').textContent='Re-schedule';
+    document.getElementById('nbBtn').className='nb-btn ok';
+  }
+}
+
+async function scheduleAll(){
+  const reg=await navigator.serviceWorker.ready;
+  if(!reg.active)return;
+  const now=new Date();
+  const list=[];
+  const routine=getCurrentRoutine();
+  routine.forEach(r=>{
+    const[rh,rm]=r.time.split(':').map(Number);
+    const t=new Date(now);t.setHours(rh,rm,0,0);
+    const delay=t-now;
+    let body=r.nb;
+    if(r.isExercise){const ex=getTodayExercise();body=`${ex.title} — ${ex.detail.split('.')[0]}. ${ex.dur}`;}
+    if(delay>0)list.push({id:r.id,title:r.nt,body,delay});
+  });
+  if(isWeekday){
+    HOURLY_NOTIFS.forEach(h=>{
+      const t=new Date(now);t.setHours(h.h,0,0,0);
+      const delay=t-now;
+      if(delay>0)list.push({id:'hw'+h.h,title:h.t,body:h.b,delay});
+    });
+  }
+  reg.active.postMessage({type:'SCHEDULE_ALL',list});
+}
+
+// ===== TODAY EXERCISE CARD =====
+function renderTodayExCard(){
+  const ex=getTodayExercise();
+  const ph=PHASES[S.activePhase];
+  const exDone=!!S.done['rw_ex']||!!S.done['rwe_ex'];
+  document.getElementById('todayExCard').innerHTML=`
+    <div class="today-ex">
+      <div class="tex-hdr">
+        <div class="tex-icon">💪</div>
+        <div>
+          <div class="tex-title">${ex.title}</div>
+          <div class="tex-phase">${ph.label} · ${ph.sub} · ${ex.day} · ${ex.dur}</div>
+        </div>
+      </div>
+      <div class="tex-detail">${ex.detail}</div>
+      <div class="tex-steps">${ex.steps.map(s=>`<div class="tex-step"><div class="tex-step-dot"></div><span>${s}</span></div>`).join('')}</div>
+      <button class="tex-done-btn${exDone?' done':''}" onclick="markExDone()">${exDone?'✅ Exercise done!':'Mark exercise as done ✓'}</button>
+    </div>`;
+}
+
+function markExDone(){
+  const id=isWeekday?'rw_ex':'rwe_ex';
+  S.done[id]=true;save();
+  renderTodayExCard();renderRoutine();
+}
+
+// ===== ROUTINE =====
+function renderRoutine(){
+  const now=new Date();
+  const nm=now.getHours()*60+now.getMinutes();
+  const routine=getCurrentRoutine();
+  const dow=now.getDay();
+  const isWknd=dow===0||dow===6;
+
+  if(isWknd){
+    document.getElementById('wkndBadge').innerHTML='<div class="wknd-badge">🌞 Weekend routine — no work walk breaks, later start</div>';
+  } else {
+    document.getElementById('wkndBadge').innerHTML='';
+  }
+
+  document.getElementById('rl').innerHTML=routine.map(r=>{
+    const done=!!S.done[r.id];
+    const[rh,rm]=r.time.split(':').map(Number);
+    const rmin=rh*60+rm;
+    const isNow=!done&&nm>=rmin&&nm<rmin+90;
+    let sub=r.sub;
+    if(r.isExercise){const ex=getTodayExercise();sub=ex.title+' — '+ex.dur;}
+    return `<div class="rc${done?' done':isNow?' now':''}" onclick="toggleTask('${r.id}')">
+      <div class="tbadge">${r.lbl}</div>
+      <div class="ri">
+        <div class="rt">${r.icon} ${r.title}</div>
+        <div class="rs">${sub}</div>
+        ${isNow?'<span class="nowbadge">Do this now!</span>':''}
+      </div>
+      <div class="ck">${done?'✓':''}</div>
+    </div>`;
+  }).join('');
+  updateProg();
+}
+
+function toggleTask(id){
+  S.done[id]=!S.done[id];
+  // Sync exercise task with exercise card
+  if(id==='rw_ex'||id==='rwe_ex'){renderTodayExCard();}
+  save();renderRoutine();
+}
+
+function updateProg(){
+  const routine=getCurrentRoutine();
+  const tot=routine.length;
+  const dn=Object.values(S.done).filter(Boolean).length;
+  const pct=Math.round(dn/tot*100);
+  document.getElementById('ppct').textContent=pct+'%';
+  document.getElementById('pring').style.strokeDashoffset=175.9-(175.9*pct/100);
+  const msgs=[[100,'Perfect day! 🎉','All tasks done — you are building real change!'],[60,'Almost done! ⭐','Finish strong today!'],[30,'Halfway there! 🔥','Brilliant work — keep going!'],[1,'Great start! 🌱','Keep ticking — every one counts.'],[0,'Ready to start! 💪','Tap each task when you complete it.']];
+  const m=msgs.find(x=>pct>=x[0]);
+  document.getElementById('ptitle').textContent=m[1];
+  document.getElementById('pmsg').textContent=m[2];
+}
+
+// ===== WATER =====
+function renderWater(){
+  document.getElementById('wg').innerHTML=Array.from({length:10},(_,i)=>
+    `<button class="gb${S.water>i?' f':''}" onclick="setWater(${i+1})">💧</button>`
+  ).join('');
+  document.getElementById('wcnt').textContent=`${S.water} of 8 — ${S.water>=8?'🎉 Target reached!':S.water>=5?'Good, keep going!':'Keep drinking!'}`;
+}
+function setWater(n){S.water=S.water===n?n-1:n;if(S.water<0)S.water=0;save();renderWater();}
+
+// ===== MEALS =====
+const DAYS=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+const SLOTS=[
+  {id:'breakfast',label:'🌅 Breakfast',time:'6:00 AM'},
+  {id:'midmorning',label:'☀️ Mid-morning',time:'10:30 AM'},
+  {id:'lunch',label:'🍱 Lunch',time:'1:00 PM'},
+  {id:'dinner',label:'🌙 Dinner',time:'7:30 PM'},
+];
+
+function renderDayStrip(){
+  const base=new Date();base.setDate(base.getDate()-((base.getDay()+6)%7));
+  document.getElementById('dayStrip').innerHTML=Array.from({length:7},(_,i)=>{
+    const d=new Date(base);d.setDate(base.getDate()+i);
+    const key=d.toDateString();
+    const has=S.plans[key]&&Object.values(S.plans[key]).some(Boolean);
+    const act=S.activeDay===i;
+    const isTod=key===todayStr;
+    return `<button class="day-btn${act?' active':''}${isTod&&!act?' today-mark':''}" onclick="setDay(${i})">
+      <div class="dn">${DAYS[i]}</div>
+      <div class="dd">${d.getDate()}</div>
+      ${has?'<div class="ddot"></div>':'<div style="height:7px"></div>'}
+    </button>`;
+  }).join('');
+}
+
+function setDay(i){S.activeDay=i;save();renderDayStrip();renderMealSlots();renderShop();}
+
+function getDayKey(i){
+  const b=new Date();b.setDate(b.getDate()-((b.getDay()+6)%7)+i);return b.toDateString();
+}
+
+function renderMealSlots(){
+  const key=getDayKey(S.activeDay);
+  const plan=S.plans[key]||{};
+  document.getElementById('mealSlots').innerHTML=SLOTS.map(slot=>{
+    const opts=MEAL_OPTIONS[slot.id]||[];
+    const sel=plan[slot.id]||'';
+    return `<div class="msc">
+      <div class="msh"><div class="msl">${slot.label}</div><div class="mst">${slot.time}</div></div>
+      <div class="mopts">${opts.map(o=>`
+        <div class="mopt${sel===o.id?' sel':''}" onclick="selMeal('${slot.id}','${o.id}')">
+          <div class="moi">${o.icon}</div>
+          <div style="flex:1"><div class="mon">${o.name}</div>
+            <div class="motags">${o.tags.map(t=>`<span class="tag t${t[0]}">${t}</span>`).join('')}</div>
+          </div>
+          ${sel===o.id?'<div style="color:#4CAF82;font-size:16px;font-weight:900">✓</div>':''}
+        </div>`).join('')}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function selMeal(slot,id){
+  const key=getDayKey(S.activeDay);
+  if(!S.plans[key])S.plans[key]={};
+  S.plans[key][slot]=S.plans[key][slot]===id?'':id;
+  S.shopC={};save();renderMealSlots();renderShop();renderDayStrip();
+}
+
+function renderShop(){
+  const key=getDayKey(S.activeDay);
+  const plan=S.plans[key]||{};
+  const ings=[];const seen=new Set();
+  SLOTS.forEach(slot=>{
+    const mid=plan[slot.id];if(!mid)return;
+    const m=(MEAL_OPTIONS[slot.id]||[]).find(o=>o.id===mid);if(!m)return;
+    m.ing.forEach(ing=>{
+      const base=ing.split('—')[0].trim().toLowerCase();
+      if(!seen.has(base)){seen.add(base);ings.push(ing);}
+    });
+  });
+  const el=document.getElementById('shopList');
+  if(!ings.length){el.innerHTML=`<div class="shopcard"><div style="padding:18px;text-align:center;color:var(--t3);font-size:11px;font-weight:600">Select meals above to see<br>what to buy 🛒</div></div>`;return;}
+  el.innerHTML=`<div class="shopcard">
+    <div class="shophead">
+      <div><div class="shophead-t">🛒 ${DAYS[S.activeDay]} ingredients</div><div class="shophead-s">${ings.length} items — buy before going home</div></div>
+    </div>
+    <div class="shopbody">${ings.map((g,i)=>{
+      const chk=!!S.shopC[i];
+      return `<div class="si"><div class="sck${chk?' chk':''}" onclick="toggleShop(${i})">${chk?'✓':''}</div><div class="st2${chk?' chk':''}">${g}</div></div>`;
+    }).join('')}</div>
+  </div>`;
+}
+function toggleShop(i){S.shopC[i]=!S.shopC[i];save();renderShop();}
+
+// ===== EXERCISE =====
+function renderPhaseTabs(){
+  document.getElementById('phaseTabs').innerHTML=PHASES.map((p,i)=>
+    `<button class="ptab${S.activePhase===i?' active':''}" onclick="setPhase(${i})">${p.label}<br><span style="font-size:9px;font-weight:600;opacity:.8">${p.sub}</span></button>`
+  ).join('');
+}
+
+function setPhase(i){
+  if(S.activePhase!==i){
+    S.phaseStartDate=new Date().toISOString().split('T')[0];
+    S.activePhase=i;save();
+    updatePhaseHeader();
+    toast(`📋 Switched to ${PHASES[i].label} — ${PHASES[i].sub}. Starting from today.`);
+  }
+  renderPhaseTabs();renderWeekTrack();renderExContent();
+  renderTodayExCard();renderRoutine();
+}
+
+function renderWeekTrack(){
+  const ph=PHASES[S.activePhase];
+  const curWeek=getPhaseWeek();
+  const phNames=['Foundation','Building strength','Transformation'];
+  document.getElementById('weekTrack').innerHTML=`<div class="week-track">
+    <div class="wt-hdr">
+      <div class="wt-title">Progress tracker</div>
+      <div class="wt-badge" style="background:${ph.badge};color:${ph.badgeC}">Week ${curWeek} of ${ph.totalWeeks}</div>
+    </div>
+    <div class="wt-prog">${Array.from({length:ph.totalWeeks},(_,i)=>`<div class="wk-dot${i<curWeek-1?' done':i===curWeek-1?' current':''}"></div>`).join('')}</div>
+    <div class="wt-weeks"><span class="wt-wlabel">Week 1</span><span class="wt-wlabel">Week ${ph.totalWeeks}</span></div>
+  </div>`;
+}
+
+function renderExContent(){
+  const ph=PHASES[S.activePhase];
+  const dow=new Date().getDay();
+  const todayIdx=dow===0?6:dow-1;
+  document.getElementById('exContent').innerHTML=`<div class="exc-card">
+    <div class="exc-hdr">
+      <div><div class="exc-hdr-t">${ph.label} — ${ph.sub}</div><div class="exc-hdr-s">${ph.weeks} · ${ph.desc.split('.')[0]}</div></div>
+    </div>
+    <div class="exc-body">
+      <div class="exc-phase-desc">${ph.desc}</div>
+      ${ph.days.map((d,i)=>{
+        const isToday=i===todayIdx;
+        return `<div class="exday${isToday?' today-ex-row':''}">
+          <div class="exday-day">${d.day}${isToday?'<span class="today-marker">Today</span>':''}</div>
+          <div class="exday-info">
+            <div class="exday-title">${d.title}</div>
+            <div class="exday-detail">${d.detail}</div>
+            <span class="exday-dur">⏱ ${d.dur}</span>
+          </div>
+        </div>`;
+      }).join('')}
+      <div class="ex-tip">💡 ${ph.tip}</div>
+    </div>
+  </div>`;
+}
+
+// ===== PROGRESS =====
+function renderProgress(){
+  const histKeys=Object.keys(S.history).sort((a,b)=>new Date(b)-new Date(a));
+  const totalDays=histKeys.length;
+  const avgScore=totalDays?Math.round(histKeys.reduce((s,k)=>s+S.history[k].score,0)/totalDays):0;
+  const perfect=histKeys.filter(k=>S.history[k].score>=80).length;
+  const avgWater=totalDays?Math.round(histKeys.reduce((s,k)=>s+S.history[k].water,0)/totalDays):0;
+  const ph=PHASES[S.activePhase];
+  const curWeek=getPhaseWeek();
+
+  // Calendar — last 5 weeks
+  const calDays=[];
+  const calStart=new Date(NOW);calStart.setDate(calStart.getDate()-34);
+  calStart.setDate(calStart.getDate()-((calStart.getDay()+6)%7));
+  for(let i=0;i<35;i++){const d=new Date(calStart);d.setDate(calStart.getDate()+i);calDays.push(d);}
+
+  document.getElementById('progressContent').innerHTML=`
+    <div class="sum-card">
+      <div class="sum-title">📊 Overall summary</div>
+      <div class="stat-grid">
+        <div class="stat-box"><div class="stat-n" style="color:var(--or)">${totalDays}</div><div class="stat-l">Days tracked</div></div>
+        <div class="stat-box"><div class="stat-n" style="color:var(--mi)">${avgScore}%</div><div class="stat-l">Avg daily score</div></div>
+        <div class="stat-box"><div class="stat-n" style="color:var(--pu)">${perfect}</div><div class="stat-l">Great days (80%+)</div></div>
+        <div class="stat-box"><div class="stat-n" style="color:var(--sk)">${avgWater}</div><div class="stat-l">Avg glasses/day</div></div>
+      </div>
+    </div>
+
+    <div class="sum-card">
+      <div class="sum-title">🏋️ Exercise journey — ${ph.label} · Week ${curWeek} of ${ph.totalWeeks}</div>
+      <div style="background:var(--cr);border-radius:9px;padding:9px 11px;font-size:11px;color:var(--t2);font-weight:600;line-height:1.6">
+        Currently on: <b style="color:var(--pu)">${ph.label} — ${ph.sub}</b><br>
+        ${ph.weeks} · ${ph.desc.split('.')[0]}.<br>
+        <span style="color:var(--or)">Tap the Exercise tab to see this week's plan or change phase.</span>
+      </div>
+    </div>
+
+    <div class="sum-card">
+      <div class="sum-title">📅 Last 5 weeks — daily scores</div>
+      <div class="cal-grid">
+        ${['M','T','W','T','F','S','S'].map(d=>`<div class="cal-hdr">${d}</div>`).join('')}
+        ${calDays.map(d=>{
+          const key=d.toDateString();
+          const isToday=key===NOW.toDateString();
+          const rec=S.history[key];
+          let cls='cal-day';
+          if(rec){cls+=rec.score>=80?' perfect':' has-data';}
+          if(isToday)cls+=' today-cal';
+          return `<div class="${cls}" title="${d.getDate()}/${d.getMonth()+1}${rec?' — '+rec.score+'%':''}">${d.getDate()}</div>`;
+        }).join('')}
+      </div>
+      <div style="display:flex;gap:12px;margin-top:8px;font-size:9px;font-weight:700;color:var(--t3)">
+        <span><span style="display:inline-block;width:10px;height:10px;background:var(--mi);border-radius:2px;margin-right:4px"></span>80%+ great day</span>
+        <span><span style="display:inline-block;width:10px;height:10px;background:#D4EAFF;border-radius:2px;margin-right:4px"></span>Any progress</span>
+        <span><span style="display:inline-block;width:10px;height:10px;background:var(--bd);border-radius:2px;margin-right:4px"></span>No data</span>
+      </div>
+    </div>
+
+    ${totalDays>0?`<div class="sum-card">
+      <div class="sum-title">📋 Recent days</div>
+      <div class="history-list">
+        ${histKeys.slice(0,14).map(k=>{
+          const r=S.history[k];
+          const d=new Date(k);
+          const label=d.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'});
+          const scoreCol=r.score>=80?'var(--mi)':r.score>=50?'var(--or)':'var(--re)';
+          return `<div class="hist-item">
+            <div class="hist-date">${label}</div>
+            <div class="hist-bars">
+              <div class="hist-bar-wrap">
+                <div class="hist-bar-label">Tasks</div>
+                <div class="hist-bar"><div class="hist-bar-fill" style="width:${r.score}%;background:${scoreCol}"></div></div>
+              </div>
+              <div class="hist-bar-wrap">
+                <div class="hist-bar-label">Water</div>
+                <div class="hist-bar"><div class="hist-bar-fill" style="width:${Math.min(r.water/8*100,100)}%;background:var(--sk)"></div></div>
+              </div>
+            </div>
+            <div class="hist-score" style="color:${scoreCol}">${r.score}%</div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`:'<div class="sum-card" style="text-align:center;color:var(--t3);font-size:12px;font-weight:600;padding:20px">Complete your first day to see progress here 🌱<br><br>Your daily scores, water intake, and exercise history will all appear here as you go.</div>'}
+  `;
+}
+
+// ===== SUPPLEMENTS =====
+function renderSupp(){
+  document.getElementById('suppList').innerHTML=SUPPS.map(s=>{
+    const tk=!!S.supp[s.id];
+    return `<div class="sc${tk?' tk':''}" onclick="toggleSupp('${s.id}')">
+      <div style="font-size:24px;flex-shrink:0">${s.icon}</div>
+      <div style="flex:1"><div class="sn">${s.name}</div><div class="sd">${s.detail}</div><div class="sw">⏰ ${s.when}</div></div>
+      <div class="ck" style="${tk?'background:var(--mi);border-color:var(--mi);color:#fff':'border-color:var(--bd)'}">${tk?'✓':''}</div>
+    </div>`;
+  }).join('');
+}
+function toggleSupp(id){S.supp[id]=!S.supp[id];save();renderSupp();}
+
+// ===== NAV =====
+function goPage(id,btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.ni').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  btn.classList.add('active');
+  if(id==='meals'){renderDayStrip();renderMealSlots();renderShop();}
+  if(id==='exercise'){renderPhaseTabs();renderWeekTrack();renderExContent();}
+  if(id==='progress')renderProgress();
+  if(id==='tips')renderSupp();
+}
+
+// ===== TOAST =====
+function toast(msg){
+  let t=document.querySelector('.toast');
+  if(t)t.remove();
+  t=document.createElement('div');t.className='toast';t.textContent=msg;
+  document.body.appendChild(t);
+  setTimeout(()=>{t.style.opacity='0';setTimeout(()=>t.remove(),300);},4000);
+}
+
+// ===== BOOT =====
+setup();
+renderRoutine();
+renderWater();
+renderTodayExCard();
+renderSupp();
+setInterval(()=>{renderRoutine();renderTodayExCard();},60000);
+</script>
+</body>
+</html>
